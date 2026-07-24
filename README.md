@@ -2,9 +2,10 @@
 
 PaperBites is a modern Android application designed for consuming bite-sized Research Paper.
 
+<!--suppress HtmlDeprecatedAttribute -->
 <p align="center">
-  <img src="./app/src/main/assets/png/PaperBitesExample_1.jpeg" width="30%" alt="PaperBites Screenshot 1">
-  <img src="./app/src/main/assets/png/PaperBitesExample_2.jpeg" width="30%" alt="PaperBites Screenshot 2">
+  <img src="./app/src/main/assets/png/PaperBitesExample_1.jpeg" width="45%" alt="PaperBites Screenshot 1">
+  <img src="./app/src/main/assets/png/PaperBitesExample_2.jpeg" width="450%" alt="PaperBites Screenshot 2">
 </p>
 
 
