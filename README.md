@@ -23,6 +23,7 @@ PaperBites is a modern Android application designed for consuming bite-sized Res
 ## TODO
 
 - [ ] Implement advances search for articles.
+- [ ] Fix latex rendering issue on the abstract
 - [ ] Implement Saved and Bookmark
 - [ ] Implement Read Full Paper
 - [ ] Add quick share link/doi for the paper
