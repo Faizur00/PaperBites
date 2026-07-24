@@ -1,0 +1,10 @@
+- [x] Implement methods in `PaperRepository`
+    - [x] `insertAll`
+    - [x] `pagingSource`
+    - [x] `unseenCount`
+    - [x] `pagingSourceByField`
+    - [x] `unseenCountByField`
+    - [x] `markServed`
+    - [x] `setBookmarked`
+- [x] Verify compilation
+- [x] Create walkthrough

@@ -1,0 +1,9 @@
+- `[x]` Create `Topic.kt` data model with Field and Subfield hierarchy
+- `[x]` Update `CustomToggleBox.kt` to handle flexible width and text wrapping
+- `[x]` Uncomment and refactor `DrawerContent.kt`
+    - `[x]` Uncomment file content
+    - `[x]` Implement Field selection UI
+    - `[x]` Update `TopicFilterSection` for two-level selection
+- `[x]` Activate drawer in `MainFeedScreen.kt`
+- `[x]` Verify build and UI layout
+- `[ ]` Verify build and UI layout

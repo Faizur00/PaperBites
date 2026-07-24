@@ -1,0 +1,7 @@
+- [x] Update `PaperEntity` with `language` field and index
+- [x] Add language filtering methods to `PaperDao`
+- [x] Bump `AppDatabase` version and enable destructive migration
+- [x] Update `PaperRepository` with resilient JSON decoding and new methods
+- [x] Update `ArticleData` in `tempData.kt` for consistency
+- [x] Trigger `seedIfNeeded()` from `MainActivity`
+- [x] Verify build and decoding logic

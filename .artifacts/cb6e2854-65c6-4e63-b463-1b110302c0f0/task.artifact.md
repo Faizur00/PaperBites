@@ -1,0 +1,3 @@
+- [x] Add `subfield` to `PaperEntity`
+- [x] Increment database version and add migration in `AppDatabase`
+- [x] Verify build

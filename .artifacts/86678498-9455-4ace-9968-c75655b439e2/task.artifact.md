@@ -1,0 +1,3 @@
+- [x] Update `PaperRepository.kt` PagingConfig
+- [x] Update `PaperRemoteMediator.kt` threshold and perPage size
+- [x] Verify changes (Build)
