@@ -22,7 +22,9 @@ import com.example.paperbites.ui.common.AnimatedIconButton
 import com.example.paperbites.ui.theme.libreBaskervilleFontFamily
 
 @Composable
-fun BookmarkTopBar(){
+fun BookmarkTopBar(
+    onBack: () -> Unit
+){
     Row(
         modifier = Modifier
             .statusBarsPadding()
@@ -35,8 +37,8 @@ fun BookmarkTopBar(){
     ) {
         AnimatedIconButton(
             icon = Icons.AutoMirrored.Outlined.ArrowBack,
-            contentDescription = "bookmarks",
-            onClick = {},
+            contentDescription = "back",
+            onClick = onBack,
             iconColor = Color(0xFF1A1A1A),
             modifier = Modifier
         )
@@ -63,6 +65,6 @@ fun BookmarkTopBar(){
 @Preview(showSystemUi = true)
 @Composable
 fun BookmarkPreview(){
-    BookmarkTopBar()
+    BookmarkTopBar(onBack = {})
 }
 

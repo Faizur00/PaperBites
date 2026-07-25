@@ -1,4 +1,4 @@
-package com.example.paperbites.ui.mainfeed
+package com.example.paperbites.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -74,8 +74,7 @@ class MainFeedViewModel(
      */
     fun toggleBookmark(paper: PaperEntity) {
         viewModelScope.launch {
-            paperRepository.setBookmarked(paper.id, !paper.bookmarked)
+            paperRepository.setBookmarked(paper, !paper.bookmarked)
         }
     }
 }
-

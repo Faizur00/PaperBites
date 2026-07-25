@@ -1,6 +1,0 @@
-- [x] Update `OpenAlexApi.kt` with `sample` and `seed` parameters
-- [x] Implement network test in `MainActivity.kt`
-- [x] Verify build and provide instructions for Logcat verification
-- [x] Clean up temporary test code
-    - [x] Revert `MainActivity.kt`
-    - [x] Revert `OpenAlexApi.kt`

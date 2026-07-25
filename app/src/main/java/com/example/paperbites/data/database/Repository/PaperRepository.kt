@@ -12,6 +12,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.paperbites.data.database.AppDatabase
 import com.example.paperbites.data.database.Dao.PaperDao
+import com.example.paperbites.data.database.Entity.BookmarkEntity
 import com.example.paperbites.data.database.Entity.PaperEntity
 import com.example.paperbites.datastore.FilterSettings
 import com.example.paperbites.network.OpenAlexApi
@@ -35,6 +36,7 @@ class PaperRepository(
     private val context: Context
 ) {
     private val paperDao = db.paperDao()
+    private val bookmarkDao = db.bookmarkDao()
 
     @OptIn(ExperimentalPagingApi::class)
     fun getPagedPapers(filters: FilterSettings): Flow<PagingData<PaperEntity>> = Pager(
@@ -89,6 +91,27 @@ class PaperRepository(
     suspend fun markServed(ids: List<String>, now: Long = System.currentTimeMillis()) =
         paperDao.markServed(ids, now)
 
-    suspend fun setBookmarked(id: String, saved: Boolean) = paperDao.setBookmarked(id, saved)
+    suspend fun setBookmarked(paper: PaperEntity, saved: Boolean) {
+        paperDao.setBookmarked(paper.id, saved)
+        if (saved) {
+            bookmarkDao.add(paper.toBookmarkEntity())
+        } else {
+            bookmarkDao.remove(paper.id)
+        }
+    }
+}
+
+fun PaperEntity.toBookmarkEntity(): BookmarkEntity {
+    return BookmarkEntity(
+        paperId = id,
+        title = title,
+        authorsDisplay = authorsDisplay,
+        abstract = abstract,
+        venueName = venueName,
+        doi = doi,
+        oaUrl = null, // PaperEntity doesn't have oaUrl currently
+        publicationYear = publicationYear,
+        fieldName = fieldName
+    )
 }
 

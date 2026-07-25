@@ -1,5 +1,0 @@
-- [x] Add DataStore dependency to `libs.versions.toml`
-- [x] Add DataStore dependency to `app/build.gradle.kts`
-- [x] Sync Gradle
-- [x] Create `UserPreferencesRepository.kt`
-- [x] Verify build

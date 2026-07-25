@@ -1,3 +1,0 @@
-- `[x]` Implement `NetworkModule.kt`
-- `[x]` Verify build
-- `[x]` Create walkthrough

@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -35,6 +34,7 @@ import com.example.paperbites.ui.mainfeed.components.MainScreenTopBar
 import com.example.paperbites.ui.theme.BGWhite
 import com.example.paperbites.ui.theme.PaperBitesTheme
 import com.example.paperbites.ui.viewmodel.AppViewModelProvider
+import com.example.paperbites.ui.viewmodel.MainFeedViewModel
 import kotlinx.coroutines.launch
 
 private const val SERVED_BATCH_SIZE = 10
@@ -42,6 +42,7 @@ private const val SERVED_BATCH_SIZE = 10
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainFeedScreen(
+    onOpenBookmarks: () -> Unit,
     viewModel: MainFeedViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val pagedPapers = viewModel.pagedPapers.collectAsLazyPagingItems()
@@ -110,7 +111,8 @@ fun MainFeedScreen(
                                 if (drawerState.isClosed) drawerState.open()
                             }
                         }
-                    }
+                    },
+                    onOpenBookmarks = onOpenBookmarks
                 )
             },
             bottomBar = {
@@ -147,7 +149,7 @@ fun MainFeedScreen(
 @Composable
 fun MainFeedScreenPreview() {
     PaperBitesTheme {
-        MainFeedScreen()
+        MainFeedScreen(onOpenBookmarks = {})
     }
 }
 

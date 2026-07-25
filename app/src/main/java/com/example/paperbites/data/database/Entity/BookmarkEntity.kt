@@ -12,5 +12,7 @@ data class BookmarkEntity(
     val abstract: String,
     val venueName: String?,
     val doi: String?,
-    val oaUrl: String?
+    val oaUrl: String?,
+    val publicationYear: Int? = null,
+    val fieldName: String? = null
 )

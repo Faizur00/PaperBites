@@ -220,7 +220,7 @@ fun ArticleAbstract(abstract: String){
                 Text(
                     modifier = Modifier
                         .padding(horizontal = 18.dp, vertical = 9.dp),
-                    text = "READ MORE",
+                    text = "READ FULL ABSTRACT",
                     fontFamily = jetbrainsMonoFontFamily,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold

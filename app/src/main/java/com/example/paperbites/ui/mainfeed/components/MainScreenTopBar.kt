@@ -18,7 +18,8 @@ import kotlinx.coroutines.Job
 
 @Composable
 fun MainScreenTopBar(
-    onOpenDrawer: () -> Unit
+    onOpenDrawer: () -> Unit,
+    onOpenBookmarks: () -> Unit
 ){
     Row(
         modifier = Modifier
@@ -42,7 +43,7 @@ fun MainScreenTopBar(
         AnimatedIconButton(
             icon = Icons.Outlined.Bookmarks,
             contentDescription = "bookmarks",
-            onClick = {},
+            onClick = onOpenBookmarks,
             iconColor = Color(0xFF1A1A1A),
             modifier = Modifier
         )

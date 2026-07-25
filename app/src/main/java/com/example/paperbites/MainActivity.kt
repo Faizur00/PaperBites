@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.paperbites.ui.PaperBitesNavHost
 import com.example.paperbites.ui.mainfeed.MainFeedScreen
 import com.example.paperbites.ui.theme.PaperBitesTheme
 
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
             }
 
             PaperBitesTheme {
-                MainFeedScreen()
+                PaperBitesNavHost()
             }
         }
     }
@@ -42,7 +43,7 @@ fun PaperBytesPreviewWrapper(content: @Composable () -> Unit) {
 @Composable
 fun MainPreviewPhone() {
     PaperBytesPreviewWrapper {
-        MainFeedScreen()
+        MainFeedScreen(onOpenBookmarks = {})
     }
 }
 
@@ -50,6 +51,6 @@ fun MainPreviewPhone() {
 @Composable
 fun MainPreviewTablet() {
     PaperBytesPreviewWrapper {
-        MainFeedScreen()
+        MainFeedScreen(onOpenBookmarks = {})
     }
 }

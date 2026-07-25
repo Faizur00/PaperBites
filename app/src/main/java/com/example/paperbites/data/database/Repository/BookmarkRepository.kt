@@ -16,4 +16,8 @@ class BookmarkRepository(
     suspend fun delete(bookmark: BookmarkEntity) {
         bookmarkDao.remove(id = bookmark.paperId)
     }
+
+    suspend fun removeById(id: String) {
+        bookmarkDao.remove(id)
+    }
 }

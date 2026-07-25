@@ -1,11 +1,9 @@
 package com.example.paperbites.ui.viewmodel
 
-import androidx.lifecycle.ViewModelProvider.Factory
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.paperbites.PaperBitesApplication
-import com.example.paperbites.ui.mainfeed.MainFeedViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire PaperBytes app
@@ -18,6 +16,14 @@ object AppViewModelProvider {
             MainFeedViewModel(
                 app.container.paperRepository,
                 app.container.userPreferencesRepository
+            )
+        }
+
+        // Initializer for BookmarkViewModel
+        initializer {
+            val app = PaperBitesApplication()
+            BookmarkViewModel(
+                app.container.bookmarkRepository
             )
         }
     }

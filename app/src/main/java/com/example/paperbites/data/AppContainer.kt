@@ -2,6 +2,7 @@ package com.example.paperbites.data
 
 import android.content.Context
 import com.example.paperbites.data.database.AppDatabase
+import com.example.paperbites.data.database.Repository.BookmarkRepository
 import com.example.paperbites.data.database.Repository.PaperRepository
 import com.example.paperbites.datastore.UserPreferencesRepository
 import com.example.paperbites.network.NetworkModule
@@ -12,6 +13,7 @@ import com.example.paperbites.network.OpenAlexApi
  */
 interface AppContainer {
     val paperRepository: PaperRepository
+    val bookmarkRepository: BookmarkRepository
     val userPreferencesRepository: UserPreferencesRepository
 }
 
@@ -30,6 +32,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val paperRepository: PaperRepository by lazy {
         PaperRepository(db, api, context)
+    }
+
+    override val bookmarkRepository: BookmarkRepository by lazy {
+        BookmarkRepository(db.bookmarkDao())
     }
 
     override val userPreferencesRepository: UserPreferencesRepository by lazy {
