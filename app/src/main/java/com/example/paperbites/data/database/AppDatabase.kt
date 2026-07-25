@@ -13,7 +13,7 @@ import com.example.paperbites.data.database.Dao.PaperDao
 import com.example.paperbites.data.database.Entity.BookmarkEntity
 import com.example.paperbites.data.database.Entity.PaperEntity
 
-@Database(entities = [PaperEntity::class, BookmarkEntity::class], version = 4)
+@Database(entities = [PaperEntity::class, BookmarkEntity::class], version = 5)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun paperDao(): PaperDao
     abstract fun bookmarkDao(): BookmarkDao
@@ -39,6 +39,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE bookmarks ADD COLUMN isExpanded INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         @Volatile private var INSTANCE: AppDatabase? = null
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -47,7 +53,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "papers.db"
                 )
-                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { INSTANCE = it }

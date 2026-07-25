@@ -36,7 +36,10 @@ fun BookmarkScreen(
         ) {
             BookmarkGrid(
                 modifier = Modifier.padding(innerPadding),
-                papers = bookmarkUiState
+                papers = bookmarkUiState,
+                onToggleExpansion = { paper ->
+                    viewModel.toggleExpansion(paper.paperId, paper.isExpanded)
+                }
             )
         }
     }

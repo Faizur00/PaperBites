@@ -20,4 +20,8 @@ class BookmarkRepository(
     suspend fun removeById(id: String) {
         bookmarkDao.remove(id)
     }
+
+    suspend fun updateExpansion(id: String, isExpanded: Boolean) {
+        bookmarkDao.updateExpansion(id, isExpanded)
+    }
 }

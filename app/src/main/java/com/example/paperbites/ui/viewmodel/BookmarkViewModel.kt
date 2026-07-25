@@ -20,6 +20,12 @@ class BookmarkViewModel(
             initialValue = emptyList()
         )
 
+    fun toggleExpansion(paperId: String, currentExpanded: Boolean) {
+        viewModelScope.launch {
+            bookmarkRepository.updateExpansion(paperId, !currentExpanded)
+        }
+    }
+
     fun removeBookmark(paperId: String) {
         viewModelScope.launch {
             bookmarkRepository.removeById(paperId)

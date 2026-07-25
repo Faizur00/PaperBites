@@ -115,7 +115,7 @@ fun ArticleHeader(tag: String, date: String, isBookmarked: Boolean = false){
 
 @Composable
 fun ArticleTitle(title: String){
-    val formattedTitle = rememberFormattedText(title, fontSize = 24.sp)
+    val formattedTitle = rememberFormattedText(title, fontSize = 24.sp, color = Color(0xFF1A1A1A))
     Box(
         modifier = Modifier
             .fillMaxWidth(1f)
@@ -153,7 +153,7 @@ fun ArticleAuthor(authors: String){
 
 @Composable
 fun ArticleAbstract(abstract: String){
-    val formattedAbstract = rememberFormattedText(abstract, fontSize = 18.sp)
+    val formattedAbstract = rememberFormattedText(abstract, fontSize = 18.sp, color = Color(0xFF222222))
     var hasVisualOverflow by remember { mutableStateOf(false) }
 
     Box(

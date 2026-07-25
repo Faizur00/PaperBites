@@ -17,4 +17,7 @@ interface BookmarkDao {
     // Get all bookmarks sorted by newest first
     @Query("SELECT * FROM bookmarks ORDER BY bookmarkedAt DESC")
     fun observeAll(): Flow<List<BookmarkEntity>>
+
+    @Query("UPDATE bookmarks SET isExpanded = :isExpanded WHERE paperId = :id")
+    suspend fun updateExpansion(id: String, isExpanded: Boolean)
 }

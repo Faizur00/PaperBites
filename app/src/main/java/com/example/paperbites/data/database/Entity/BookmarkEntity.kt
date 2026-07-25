@@ -1,6 +1,7 @@
 package com.example.paperbites.data.database.Entity
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "bookmarks")
@@ -14,5 +15,6 @@ data class BookmarkEntity(
     val doi: String?,
     val oaUrl: String?,
     val publicationYear: Int? = null,
-    val fieldName: String? = null
+    val fieldName: String? = null,
+    val isExpanded: Boolean = false
 )

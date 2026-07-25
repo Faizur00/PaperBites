@@ -18,10 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -39,11 +35,11 @@ import com.example.paperbites.ui.theme.loraFontFamily
 @Composable
 fun BookmarkCard(
     paper: BookmarkEntity,
+    onToggleExpansion: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val formattedTitle = rememberFormattedText(paper.title, fontSize = 16.sp) // Material titleMedium is around 16sp
-    val formattedAbstract = rememberFormattedText(paper.abstract, fontSize = 12.sp) // Material bodySmall is around 12sp
+    val formattedTitle = rememberFormattedText(paper.title, fontSize = 16.sp, color = Color(0xFF1A1A1A)) // Material titleMedium is around 16sp
+    val formattedAbstract = rememberFormattedText(paper.abstract, fontSize = 12.sp, color = Color(0xFF8B8987)) // Material bodySmall is around 12sp
 
     Card(
         modifier = modifier
@@ -88,7 +84,7 @@ fun BookmarkCard(
                 fontWeight = FontWeight.Normal,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color(0xFF8B8987),
-                maxLines = if (!isExpanded) 2 else 6,
+                maxLines = if (!paper.isExpanded) 2 else 6,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -106,9 +102,9 @@ fun BookmarkCard(
                     color = Color(0xFF1A1A1A)
                 )
                 AnimatedIconButton(
-                    onClick = { isExpanded = !isExpanded },
-                    icon = if (isExpanded) Icons.Outlined.CloseFullscreen else Icons.Outlined.OpenInFull,
-                    contentDescription = if (isExpanded) "Open" else "Close",
+                    onClick = onToggleExpansion,
+                    icon = if (paper.isExpanded) Icons.Outlined.CloseFullscreen else Icons.Outlined.OpenInFull,
+                    contentDescription = if (paper.isExpanded) "Open" else "Close",
                     iconColor = Color(0xFF8B8987),
                     modifier = Modifier
                         .size(16.dp)
@@ -130,8 +126,10 @@ fun BookmarkCardPreview(){
             doi = null,
             oaUrl = null,
             publicationYear = 2024,
-            fieldName = "Computer Science"
-        )
+            fieldName = "Computer Science",
+            isExpanded = true
+        ),
+        onToggleExpansion = {}
     )
 }
 

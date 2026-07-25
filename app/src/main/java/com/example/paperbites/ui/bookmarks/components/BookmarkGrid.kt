@@ -3,6 +3,7 @@ package com.example.paperbites.ui.bookmarks.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -14,6 +15,7 @@ import com.example.paperbites.data.database.Entity.BookmarkEntity
 @Composable
 fun BookmarkGrid(
     papers: List<BookmarkEntity>,
+    onToggleExpansion: (BookmarkEntity) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -26,10 +28,18 @@ fun BookmarkGrid(
     ) {
         items(
             items = papers,
-            key = { it.paperId }
+            key = { it.paperId },
+            span = { paper ->
+                if (paper.isExpanded) {
+                    GridItemSpan(maxLineSpan)
+                } else {
+                    GridItemSpan(1)
+                }
+            }
         ) { paper ->
             BookmarkCard(
                 paper = paper,
+                onToggleExpansion = { onToggleExpansion(paper) },
                 modifier = Modifier
                     .animateItem()
             )

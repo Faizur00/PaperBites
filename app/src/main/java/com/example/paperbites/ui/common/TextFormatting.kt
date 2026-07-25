@@ -19,7 +19,7 @@ data class ParsedFormattedText(
 
 /**
  * Parses raw text containing HTML formatting tags (<i>, <b>, <sub>, <sup>, <em>, <strong>),
- * LaTeX formatting (\textit{}, \textbf{}, _{}, ^{}), and LaTeX math formulas ($...$, \(...\))
+ * LaTeX formatting (\textit{}, \textbf{}, _{}, ^{}), and LaTeX math formulas ($...$, $$...$$, \(...\), \[...\])
  * into a styled Compose AnnotatedString with placeholders for LaTeX content.
  */
 fun parseFormattedText(rawText: String): ParsedFormattedText {
@@ -27,7 +27,6 @@ fun parseFormattedText(rawText: String): ParsedFormattedText {
 
     // Decode basic HTML entities first
     val decodedText = rawText
-        .replace("\\n", "\n")
         .replace("&lt;", "<")
         .replace("&gt;", ">")
         .replace("&amp;", "&")
@@ -36,7 +35,11 @@ fun parseFormattedText(rawText: String): ParsedFormattedText {
         .replace("&#39;", "'")
         .replace("&nbsp;", " ")
 
-    val tagRegex = Regex("""</?(i|em|b|strong|sub|sup|p|br|title)\b[^>]*>|\\(textit|textbf)\{|[_^]\{|\}|\$([^\$]+)\$|\\\((.*?)\\\)""", RegexOption.IGNORE_CASE)
+    // Regex to match math formulas (display & inline), HTML tags, and LaTeX style tags
+    val tagRegex = Regex(
+        """\$\$(.*?)\$\$|\\\[(.*?)\\\]|\$([^\$]+)\$|\\\((.*?)\\\)|</?(i|em|b|strong|sub|sup|p|br|title)\b[^>]*>|\\(textit|textbf)\{|[_^]\{|\}""",
+        setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+    )
     val latexFormulas = mutableMapOf<String, String>()
 
     val annotatedString = buildAnnotatedString {
@@ -83,18 +86,41 @@ fun parseFormattedText(rawText: String): ParsedFormattedText {
                     }
                 }
 
-                // LaTeX inline math
-                tagMatch.startsWith("$") -> {
-                    val formula = matchResult.groupValues[3]
-                    val id = "latex_${latexFormulas.size}"
-                    latexFormulas[id] = formula
-                    appendInlineContent(id, "[math]")
+                // Display math $$ ... $$
+                tagMatch.startsWith("$$") -> {
+                    val formula = matchResult.groupValues[1].trim()
+                    if (formula.isNotEmpty()) {
+                        val id = "latex_${latexFormulas.size}"
+                        latexFormulas[id] = formula
+                        appendInlineContent(id, "[math]")
+                    }
                 }
+                // Display math \[ ... \]
+                tagMatch.startsWith("\\[") -> {
+                    val formula = matchResult.groupValues[2].trim()
+                    if (formula.isNotEmpty()) {
+                        val id = "latex_${latexFormulas.size}"
+                        latexFormulas[id] = formula
+                        appendInlineContent(id, "[math]")
+                    }
+                }
+                // Inline math $ ... $
+                tagMatch.startsWith("$") -> {
+                    val formula = matchResult.groupValues[3].trim()
+                    if (formula.isNotEmpty()) {
+                        val id = "latex_${latexFormulas.size}"
+                        latexFormulas[id] = formula
+                        appendInlineContent(id, "[math]")
+                    }
+                }
+                // Inline math \( ... \)
                 tagMatch.startsWith("\\(") -> {
-                    val formula = matchResult.groupValues[4]
-                    val id = "latex_${latexFormulas.size}"
-                    latexFormulas[id] = formula
-                    appendInlineContent(id, "[math]")
+                    val formula = matchResult.groupValues[4].trim()
+                    if (formula.isNotEmpty()) {
+                        val id = "latex_${latexFormulas.size}"
+                        latexFormulas[id] = formula
+                        appendInlineContent(id, "[math]")
+                    }
                 }
 
                 // LaTeX opening tags
@@ -121,7 +147,7 @@ fun parseFormattedText(rawText: String): ParsedFormattedText {
 
                 // HTML closing tags
                 tagMatch.startsWith("</") -> {
-                    val tagName = matchResult.groupValues[1].lowercase()
+                    val tagName = matchResult.groupValues[5].lowercase()
                     val index = styleStack.indexOfLast { isMatchingTag(it.tagType, tagName) }
                     if (index != -1) {
                         val item = styleStack.removeAt(index)
@@ -131,7 +157,7 @@ fun parseFormattedText(rawText: String): ParsedFormattedText {
 
                 // HTML opening tags
                 tagMatch.startsWith("<") -> {
-                    val tagName = matchResult.groupValues[1].lowercase()
+                    val tagName = matchResult.groupValues[5].lowercase()
                     if (tagName in listOf("i", "em", "b", "strong", "sub", "sup")) {
                         styleStack.add(StyleStackItem(tagName, length))
                     }
@@ -176,4 +202,3 @@ private fun AnnotatedString.Builder.applyStyle(tagType: String, start: Int, end:
         addStyle(style, start, end)
     }
 }
-

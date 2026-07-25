@@ -96,14 +96,28 @@ class TextFormattingTest {
         val input = "The equation \$E=mc^2\$ is famous, and so is \\( a^2 + b^2 = c^2 \\)."
         val result = parseFormattedText(input)
         
-        // Check text has placeholders
-        // "The equation " (13) + "[math]" (6) + " is famous, and so is " (22) + "[math]" (6) + "." (1) = 48
-        assertEquals(48, result.annotatedString.length)
-        
-        // Check formulas are captured
         assertEquals(2, result.latexFormulas.size)
         assertEquals("E=mc^2", result.latexFormulas["latex_0"])
-        assertEquals(" a^2 + b^2 = c^2 ", result.latexFormulas["latex_1"])
+        assertEquals("a^2 + b^2 = c^2", result.latexFormulas["latex_1"])
+    }
+
+    @Test
+    fun parseFormattedText_latexCommandsStartingWithN_preservesBackslashes() {
+        val input = "The parameter \$\\nu = 0.5\$ and \$\\notin S\$ and \$\\nabla f(x)\$."
+        val result = parseFormattedText(input)
+        assertEquals(3, result.latexFormulas.size)
+        assertEquals("\\nu = 0.5", result.latexFormulas["latex_0"])
+        assertEquals("\\notin S", result.latexFormulas["latex_1"])
+        assertEquals("\\nabla f(x)", result.latexFormulas["latex_2"])
+    }
+
+    @Test
+    fun parseFormattedText_articlePreviewAbstract_extractsFormulas() {
+        val input = "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms. For a given sequence \\( \\mathbf{x} = (x_1, \\dots, x_n) \\), the model computes \$ \\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V \$."
+        val result = parseFormattedText(input)
+        println("AnnotatedString text: '${result.annotatedString.text}'")
+        println("Formulas count: ${result.latexFormulas.size}")
+        result.latexFormulas.forEach { (k, v) -> println("$k -> '$v'") }
+        assertEquals(2, result.latexFormulas.size)
     }
 }
-

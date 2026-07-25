@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.latex.renderer)
 
     testImplementation(libs.junit)
+    testImplementation(libs.latex.renderer)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
