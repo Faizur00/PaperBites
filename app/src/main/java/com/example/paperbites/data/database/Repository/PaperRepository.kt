@@ -41,6 +41,7 @@ class PaperRepository(
     @OptIn(ExperimentalPagingApi::class)
     fun getPagedPapers(
         filters: FilterSettings,
+        sessionId: String,
         onSoftError: ((String) -> Unit)? = null
     ): Flow<PagingData<PaperEntity>> = Pager(
         config = PagingConfig(
@@ -49,7 +50,7 @@ class PaperRepository(
             initialLoadSize = 20,
             enablePlaceholders = false
         ),
-        remoteMediator = PaperRemoteMediator(api, db, filters, onSoftError),
+        remoteMediator = PaperRemoteMediator(api, db, filters, sessionId, onSoftError),
         pagingSourceFactory = { 
             val subfieldsList = filters.subfieldIds.toList()
             paperDao.pagedPapersFiltered(
@@ -57,7 +58,8 @@ class PaperRepository(
                 hasSubfields = subfieldsList.isNotEmpty(),
                 subfields = subfieldsList,
                 fromYear = filters.fromYear,
-                toYear = filters.toYear
+                toYear = filters.toYear,
+                sessionId = sessionId
             )
         }
     ).flow

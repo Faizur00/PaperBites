@@ -28,10 +28,13 @@ PaperBites is a modern Android application designed for consuming bite-sized Res
 - [x] Add util for reading full paper on the browser
 - [x] Fix latex rendering issues
 - [x] Implement Saved and Bookmark
-- [ ] Implement Read Full Paper
+- [x] Implement Read Full Paper for bookmark
 - [ ] Add quick share link/doi for the paper
 - [ ] Further refine dark mode and add custom color themes.
 - [ ] Optimize layout
+- [ ] Create a fucking logo m8
 
 ## Bugs
-- [ ] the refresher leading the content insertion from last session when app opened
+- [x] the refresher leading the content insertion from last session when app opened
+- [x] glitch happening when bookmarking a paper outside of initial load buffer where page jump to a unexpected page
+- [x] paper chance to re-appearing unexpectedly high

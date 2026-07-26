@@ -13,7 +13,7 @@ interface PaperDao {
     // filtered feed with full search tunings
     @Query("""
         SELECT * FROM papers 
-        WHERE served = 0 
+        WHERE (served = 0 OR sessionId = :sessionId)
         AND (:fieldName IS NULL OR fieldName = :fieldName)
         AND (:hasSubfields = 0 OR subfield IN (:subfields))
         AND (:fromYear IS NULL OR publicationYear >= :fromYear)
@@ -25,7 +25,8 @@ interface PaperDao {
         hasSubfields: Boolean,
         subfields: List<String>,
         fromYear: Int?,
-        toYear: Int?
+        toYear: Int?,
+        sessionId: String?
     ): PagingSource<Int, PaperEntity>
 
     // Returns the total number of papers that haven't been seen by the user yet,
@@ -63,8 +64,11 @@ interface PaperDao {
         toYear: Int?
     ): Int
 
+    @Query("DELETE FROM papers WHERE served = 1 AND bookmarked = 0 AND sessionId != :currentSessionId")
+    suspend fun clearOldServed(currentSessionId: String)
+
     // filtered feed — backs a chosen fieldName tab/chip
-    @Query("SELECT * FROM papers WHERE served = 0 AND fieldName = :field ORDER BY shuffleKey ASC")
+    @Query("SELECT * FROM papers WHERE fieldName = :field ORDER BY shuffleKey ASC")
     fun pagingSourceByField(field: String): PagingSource<Int, PaperEntity>
 
     // Returns the number of unseen papers specifically for a given field/category
@@ -72,7 +76,7 @@ interface PaperDao {
     suspend fun unseenCountByField(field: String): Int
 
     // filtered feed — backs a chosen language
-    @Query("SELECT * FROM papers WHERE served = 0 AND language = :language ORDER BY shuffleKey ASC")
+    @Query("SELECT * FROM papers WHERE language = :language ORDER BY shuffleKey ASC")
     fun pagingSourceByLanguage(language: String): PagingSource<Int, PaperEntity>
 
     // Returns the number of unseen papers specifically for a given language

@@ -11,18 +11,24 @@ import com.example.paperbites.datastore.UserPreferencesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class MainFeedViewModel(
     private val paperRepository: PaperRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    private val _sessionId = MutableStateFlow(UUID.randomUUID().toString())
+    val sessionId: StateFlow<String> = _sessionId
 
     /**
      * Flow of filter settings from the data store.
@@ -38,16 +44,25 @@ class MainFeedViewModel(
     val softMessage: SharedFlow<String> = _softMessage.asSharedFlow()
 
     /**
-     * Flow of paged papers from the repository, reacting to filter changes.
+     * Flow of paged papers from the repository, reacting to filter and session changes.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
-    val pagedPapers: Flow<PagingData<PaperEntity>> = filterSettings
-        .flatMapLatest { settings ->
-            paperRepository.getPagedPapers(settings) { message ->
+    val pagedPapers: Flow<PagingData<PaperEntity>> = combine(filterSettings, _sessionId) { settings, session ->
+        settings to session
+    }
+        .flatMapLatest { (settings, session) ->
+            paperRepository.getPagedPapers(settings, session) { message ->
                 _softMessage.tryEmit(message)
             }
         }
         .cachedIn(viewModelScope)
+
+    /**
+     * Refreshes the session to get new random content.
+     */
+    fun refreshSession() {
+        _sessionId.value = UUID.randomUUID().toString()
+    }
 
     /**
      * Applies new search filter settings.
@@ -55,6 +70,7 @@ class MainFeedViewModel(
     fun applyFilters(settings: FilterSettings) {
         viewModelScope.launch {
             userPreferencesRepository.updateFilterSettings(settings)
+            refreshSession()
         }
     }
 
@@ -64,6 +80,7 @@ class MainFeedViewModel(
     fun resetFilters() {
         viewModelScope.launch {
             userPreferencesRepository.resetFilterSettings()
+            refreshSession()
         }
     }
 

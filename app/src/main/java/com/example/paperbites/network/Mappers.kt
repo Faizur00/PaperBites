@@ -6,7 +6,8 @@ import com.example.paperbites.data.database.Entity.PaperEntity
  * Extension function to map OpenAlexWork (network model) to PaperEntity (database model).
  */
 fun OpenAlexWork.toPaperEntity(
-    shuffleKey: Double = Math.random()
+    shuffleKey: Double = Math.random(),
+    sessionId: String? = null
 ): PaperEntity {
     return PaperEntity(
         id = this.id,
@@ -21,7 +22,8 @@ fun OpenAlexWork.toPaperEntity(
         subfield = this.primaryTopic?.subfield?.displayName,
         primaryTopicName = this.primaryTopic?.displayName,
         language = null, // OpenAlex language data is usually in a different field if needed
-        shuffleKey = shuffleKey
+        shuffleKey = shuffleKey,
+        sessionId = sessionId
     )
 }
 

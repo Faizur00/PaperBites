@@ -10,13 +10,16 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.paperbites.data.database.Dao.BookmarkDao
 import com.example.paperbites.data.database.Dao.PaperDao
+import com.example.paperbites.data.database.Dao.RemoteKeysDao
 import com.example.paperbites.data.database.Entity.BookmarkEntity
 import com.example.paperbites.data.database.Entity.PaperEntity
+import com.example.paperbites.data.database.Entity.RemoteKeys
 
-@Database(entities = [PaperEntity::class, BookmarkEntity::class], version = 5)
+@Database(entities = [PaperEntity::class, BookmarkEntity::class, RemoteKeys::class], version = 7)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun paperDao(): PaperDao
     abstract fun bookmarkDao(): BookmarkDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
 
     /**
      * The companion object provides a Thread-Safe Singleton pattern for the database instance.
@@ -45,6 +48,19 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `remote_keys` (`filterId` TEXT NOT NULL, `nextPage` INTEGER, PRIMARY KEY(`filterId`))")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE papers ADD COLUMN sessionId TEXT")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_papers_sessionId` ON `papers` (`sessionId`)")
+            }
+        }
+
         @Volatile private var INSTANCE: AppDatabase? = null
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -53,7 +69,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "papers.db"
                 )
-                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { INSTANCE = it }

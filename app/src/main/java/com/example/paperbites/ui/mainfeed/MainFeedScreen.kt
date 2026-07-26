@@ -117,14 +117,14 @@ fun MainFeedScreen(
             DrawerContent(
                 initialSettings = filterSettings,
                 onApply = { newSettings ->
-                    // Trigger 3: Filter switch triggers .refresh()
+                    // Trigger 3: Filter switch triggers refresh
                     viewModel.applyFilters(newSettings)
-                    pagedPapers.refresh()
+                    lastMarkedIndex = 0
                     scope.launch { drawerState.close() }
                 },
                 onReset = {
                     viewModel.resetFilters()
-                    pagedPapers.refresh()
+                    lastMarkedIndex = 0
                     scope.launch { drawerState.close() }
                 },
                 onCloseButton = {
@@ -164,10 +164,13 @@ fun MainFeedScreen(
             val loadState = pagedPapers.loadState.refresh
             val isRefreshing = loadState is LoadState.Loading
 
-            // Pull gesture directly invokes .refresh()
+            // Pull gesture directly invokes refreshSession()
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
-                onRefresh = { pagedPapers.refresh() },
+                onRefresh = { 
+                    lastMarkedIndex = 0
+                    viewModel.refreshSession()
+                },
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
@@ -208,7 +211,10 @@ fun MainFeedScreen(
                             Spacer(modifier = Modifier.height(24.dp))
                             SquaredButton(
                                 text = "RETRY REFRESH",
-                                onClick = { pagedPapers.refresh() },
+                                onClick = { 
+                                    lastMarkedIndex = 0
+                                    viewModel.refreshSession()
+                                },
                                 bgColor = Color(0xFF1A1A1A),
                                 textColor = Color.White,
                                 icon = Icons.Default.Refresh
@@ -218,7 +224,8 @@ fun MainFeedScreen(
                 } else {
                     VerticalPager(
                         state = pagerState,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        key = { index -> pagedPapers.peek(index)?.id ?: index }
                     ) { page ->
                         pagedPapers[page]?.let { paper ->
                             Article(paper = paper)

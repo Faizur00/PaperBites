@@ -11,7 +11,8 @@ import kotlinx.serialization.Serializable
         Index(value = ["served", "shuffleKey"]),
         Index(value = ["served", "fieldName", "shuffleKey"]),
         Index(value = ["bookmarked"]),
-        Index(value = ["language"])
+        Index(value = ["language"]),
+        Index(value = ["sessionId"])
     ]
 )
 @Serializable
@@ -31,5 +32,6 @@ data class PaperEntity(
     val shuffleKey: Double = Math.random(),
     val served: Boolean = false,
     val servedAt: Long? = null,
-    val bookmarked: Boolean = false
+    val bookmarked: Boolean = false,
+    val sessionId: String? = null
 )

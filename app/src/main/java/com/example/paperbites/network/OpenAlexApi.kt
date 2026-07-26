@@ -21,6 +21,8 @@ interface OpenAlexApi {
         @Query("per_page") perPage: Int? = null,
         @Query("cursor") cursor: String? = null,
         @Query("page") page: Int? = null,
+        @Query("sample") sample: Int? = null,
+        @Query("seed") seed: Int? = null,
         @Query("mailto") mailto: String? = null
     ): WorkResponse
 }
