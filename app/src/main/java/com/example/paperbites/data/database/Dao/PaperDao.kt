@@ -15,14 +15,15 @@ interface PaperDao {
         SELECT * FROM papers 
         WHERE served = 0 
         AND (:fieldName IS NULL OR fieldName = :fieldName)
-        AND (:subfields IS NULL OR subfield IN (:subfields))
+        AND (:hasSubfields = 0 OR subfield IN (:subfields))
         AND (:fromYear IS NULL OR publicationYear >= :fromYear)
         AND (:toYear IS NULL OR publicationYear <= :toYear)
         ORDER BY shuffleKey ASC
     """)
     fun pagedPapersFiltered(
         fieldName: String?,
-        subfields: List<String>?,
+        hasSubfields: Boolean,
+        subfields: List<String>,
         fromYear: Int?,
         toYear: Int?
     ): PagingSource<Int, PaperEntity>
@@ -33,13 +34,31 @@ interface PaperDao {
         SELECT COUNT(*) FROM papers 
         WHERE served = 0 
         AND (:fieldName IS NULL OR fieldName = :fieldName)
-        AND (:subfields IS NULL OR subfield IN (:subfields))
+        AND (:hasSubfields = 0 OR subfield IN (:subfields))
         AND (:fromYear IS NULL OR publicationYear >= :fromYear)
         AND (:toYear IS NULL OR publicationYear <= :toYear)
     """)
     suspend fun unseenCountFiltered(
         fieldName: String?,
-        subfields: List<String>?,
+        hasSubfields: Boolean,
+        subfields: List<String>,
+        fromYear: Int?,
+        toYear: Int?
+    ): Int
+
+    // Resets served status back to 0 (unseen) for papers matching the specified filter criteria.
+    @Query("""
+        UPDATE papers 
+        SET served = 0, servedAt = NULL
+        WHERE (:fieldName IS NULL OR fieldName = :fieldName)
+        AND (:hasSubfields = 0 OR subfield IN (:subfields))
+        AND (:fromYear IS NULL OR publicationYear >= :fromYear)
+        AND (:toYear IS NULL OR publicationYear <= :toYear)
+    """)
+    suspend fun resetServedFiltered(
+        fieldName: String?,
+        hasSubfields: Boolean,
+        subfields: List<String>,
         fromYear: Int?,
         toYear: Int?
     ): Int
@@ -67,4 +86,8 @@ interface PaperDao {
     // Updates the bookmark status for a specific paper
     @Query("UPDATE papers SET bookmarked = :saved WHERE id = :id")
     suspend fun setBookmarked(id: String, saved: Boolean)
+
+    // Updates the shuffleKey for a specific paper
+    @Query("UPDATE papers SET shuffleKey = :shuffleKey WHERE id = :id")
+    suspend fun updateShuffleKey(id: String, shuffleKey: Double)
 }

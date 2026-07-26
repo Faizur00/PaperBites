@@ -10,8 +10,11 @@ import com.example.paperbites.datastore.FilterSettings
 import com.example.paperbites.datastore.UserPreferencesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,13 +34,18 @@ class MainFeedViewModel(
             initialValue = FilterSettings()
         )
 
+    private val _softMessage = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val softMessage: SharedFlow<String> = _softMessage.asSharedFlow()
+
     /**
      * Flow of paged papers from the repository, reacting to filter changes.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     val pagedPapers: Flow<PagingData<PaperEntity>> = filterSettings
         .flatMapLatest { settings ->
-            paperRepository.getPagedPapers(settings)
+            paperRepository.getPagedPapers(settings) { message ->
+                _softMessage.tryEmit(message)
+            }
         }
         .cachedIn(viewModelScope)
 

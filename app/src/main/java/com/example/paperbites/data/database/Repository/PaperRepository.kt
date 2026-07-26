@@ -39,18 +39,22 @@ class PaperRepository(
     private val bookmarkDao = db.bookmarkDao()
 
     @OptIn(ExperimentalPagingApi::class)
-    fun getPagedPapers(filters: FilterSettings): Flow<PagingData<PaperEntity>> = Pager(
+    fun getPagedPapers(
+        filters: FilterSettings,
+        onSoftError: ((String) -> Unit)? = null
+    ): Flow<PagingData<PaperEntity>> = Pager(
         config = PagingConfig(
-            pageSize = 50,
-            prefetchDistance = 15,
-            initialLoadSize = 50,
+            pageSize = 20,
+            prefetchDistance = 8,
+            initialLoadSize = 20,
             enablePlaceholders = false
         ),
-        remoteMediator = PaperRemoteMediator(api, db, filters),
+        remoteMediator = PaperRemoteMediator(api, db, filters, onSoftError),
         pagingSourceFactory = { 
-            val subfieldsList = if (filters.subfieldIds.isEmpty()) null else filters.subfieldIds.toList()
+            val subfieldsList = filters.subfieldIds.toList()
             paperDao.pagedPapersFiltered(
                 fieldName = if (filters.fieldId == "cs") "Computer Science" else filters.fieldId,
+                hasSubfields = subfieldsList.isNotEmpty(),
                 subfields = subfieldsList,
                 fromYear = filters.fromYear,
                 toYear = filters.toYear

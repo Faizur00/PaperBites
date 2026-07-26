@@ -85,8 +85,8 @@ fun DrawerContent(
             Spacer(Modifier.height(24.dp))
 
             DrawerRangeFilter(
-                fromYear = draftSettings.fromYear,
-                toYear = draftSettings.toYear,
+                fromYear = draftSettings.fromYear ?: (LocalDate.now().year - 5),
+                toYear = draftSettings.toYear ?: LocalDate.now().year,
                 onRangeChanged = { from, to ->
                     draftSettings = draftSettings.copy(fromYear = from, toYear = to)
                 }

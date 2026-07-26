@@ -78,10 +78,10 @@ data class Source(
 
 @Serializable
 data class OpenAccess(
-    @SerialName("is_oa") val isOa: Boolean,
-    @SerialName("oa_status") val oaStatus: String,
+    @SerialName("is_oa") val isOa: Boolean? = null,
+    @SerialName("oa_status") val oaStatus: String? = null,
     @SerialName("oa_url") val oaUrl: String? = null,
-    @SerialName("any_repository_has_fulltext") val anyRepositoryHasFulltext: Boolean
+    @SerialName("any_repository_has_fulltext") val anyRepositoryHasFulltext: Boolean? = null
 )
 
 @Serializable

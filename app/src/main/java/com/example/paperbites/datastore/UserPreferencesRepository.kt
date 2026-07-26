@@ -22,8 +22,8 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 data class FilterSettings(
     val fieldId: String = "cs",
     val subfieldIds: Set<String> = emptySet(),
-    val fromYear: Int = LocalDate.now().year - 5,
-    val toYear: Int = LocalDate.now().year
+    val fromYear: Int? = null,
+    val toYear: Int? = null
 )
 
 class UserPreferencesRepository(private val context: Context) {
@@ -60,8 +60,8 @@ class UserPreferencesRepository(private val context: Context) {
             FilterSettings(
                 fieldId = preferences[PreferencesKeys.FILTER_FIELD_ID] ?: "cs",
                 subfieldIds = preferences[PreferencesKeys.FILTER_SUBFIELD_IDS] ?: emptySet(),
-                fromYear = preferences[PreferencesKeys.FILTER_FROM_YEAR] ?: (LocalDate.now().year - 5),
-                toYear = preferences[PreferencesKeys.FILTER_TO_YEAR] ?: LocalDate.now().year
+                fromYear = preferences[PreferencesKeys.FILTER_FROM_YEAR],
+                toYear = preferences[PreferencesKeys.FILTER_TO_YEAR]
             )
         }
 
@@ -75,8 +75,16 @@ class UserPreferencesRepository(private val context: Context) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.FILTER_FIELD_ID] = settings.fieldId
             preferences[PreferencesKeys.FILTER_SUBFIELD_IDS] = settings.subfieldIds
-            preferences[PreferencesKeys.FILTER_FROM_YEAR] = settings.fromYear
-            preferences[PreferencesKeys.FILTER_TO_YEAR] = settings.toYear
+            if (settings.fromYear != null) {
+                preferences[PreferencesKeys.FILTER_FROM_YEAR] = settings.fromYear
+            } else {
+                preferences.remove(PreferencesKeys.FILTER_FROM_YEAR)
+            }
+            if (settings.toYear != null) {
+                preferences[PreferencesKeys.FILTER_TO_YEAR] = settings.toYear
+            } else {
+                preferences.remove(PreferencesKeys.FILTER_TO_YEAR)
+            }
         }
     }
 

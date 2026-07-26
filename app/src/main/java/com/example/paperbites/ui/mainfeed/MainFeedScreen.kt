@@ -1,38 +1,57 @@
 package com.example.paperbites.ui.mainfeed
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.paperbites.ui.common.SquaredButton
 import com.example.paperbites.ui.mainfeed.components.Article
 import com.example.paperbites.ui.mainfeed.components.DrawerContent
 import com.example.paperbites.ui.mainfeed.components.MainScreenBottomBar
 import com.example.paperbites.ui.mainfeed.components.MainScreenTopBar
 import com.example.paperbites.ui.theme.BGWhite
 import com.example.paperbites.ui.theme.PaperBitesTheme
+import com.example.paperbites.ui.theme.jetbrainsMonoFontFamily
+import com.example.paperbites.ui.theme.libreBaskervilleFontFamily
 import com.example.paperbites.ui.viewmodel.AppViewModelProvider
 import com.example.paperbites.ui.viewmodel.MainFeedViewModel
 import kotlinx.coroutines.launch
@@ -50,7 +69,7 @@ fun MainFeedScreen(
     val pagerState = rememberPagerState(pageCount = {
         pagedPapers.itemCount
     })
-    
+
     val currentPaper = if (pagerState.currentPage < pagedPapers.itemCount) {
         pagedPapers[pagerState.currentPage]
     } else null
@@ -58,10 +77,23 @@ fun MainFeedScreen(
     val isCurrentBookmarked = currentPaper?.bookmarked ?: false
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val filterSettings by viewModel.filterSettings.collectAsStateWithLifecycle()
 
     var lastMarkedIndex by rememberSaveable { mutableIntStateOf(0) }
+
+    // Redundant App-start refresh call removed, as Mediator handles INITIAL_REFRESH.
+    // LaunchedEffect(Unit) {
+    //     pagedPapers.refresh()
+    // }
+
+    // Soft Error Toast/Snackbar listener
+    LaunchedEffect(Unit) {
+        viewModel.softMessage.collect { message ->
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 
     // Scroll tracking: only mark papers as served when scrolling meaningfully forward past lastMarkedIndex
     LaunchedEffect(pagerState.currentPage) {
@@ -78,20 +110,21 @@ fun MainFeedScreen(
         }
     }
 
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = true,
-
         drawerContent = {
             DrawerContent(
                 initialSettings = filterSettings,
                 onApply = { newSettings ->
+                    // Trigger 3: Filter switch triggers .refresh()
                     viewModel.applyFilters(newSettings)
+                    pagedPapers.refresh()
                     scope.launch { drawerState.close() }
                 },
                 onReset = {
                     viewModel.resetFilters()
+                    pagedPapers.refresh()
                     scope.launch { drawerState.close() }
                 },
                 onCloseButton = {
@@ -125,26 +158,77 @@ fun MainFeedScreen(
                     doi = currentPaper?.doi
                 )
             },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             containerColor = BGWhite
         ) { innerPadding ->
-            Box(
+            val loadState = pagedPapers.loadState.refresh
+            val isRefreshing = loadState is LoadState.Loading
+
+            // Pull gesture directly invokes .refresh()
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { pagedPapers.refresh() },
                 modifier = Modifier
                     .padding(innerPadding)
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
             ) {
-                VerticalPager(
-                    state = pagerState,
-                ) { page ->
-                    pagedPapers[page]?.let { paper ->
-                        Article(paper = paper)
+                val isEmpty = pagedPapers.itemCount == 0 && (
+                    loadState is LoadState.Error ||
+                            (loadState is LoadState.NotLoading && loadState.endOfPaginationReached)
+                    )
+
+                if (isEmpty) {
+                    // Truly unrecoverable state: brand-new filter with zero cached rows, offline
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "NO CONNECTION / NO CONTENT",
+                                fontFamily = libreBaskervilleFontFamily,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color(0xFF1A1A1A),
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "No cached papers are available for this filter while offline. Please connect to the internet to load content.",
+                                fontFamily = jetbrainsMonoFontFamily,
+                                fontSize = 13.sp,
+                                color = Color(0xFF666666),
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            SquaredButton(
+                                text = "RETRY REFRESH",
+                                onClick = { pagedPapers.refresh() },
+                                bgColor = Color(0xFF1A1A1A),
+                                textColor = Color.White,
+                                icon = Icons.Default.Refresh
+                            )
+                        }
+                    }
+                } else {
+                    VerticalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize()
+                    ) { page ->
+                        pagedPapers[page]?.let { paper ->
+                            Article(paper = paper)
+                        }
                     }
                 }
             }
         }
     }
 }
-
 
 @Preview(showSystemUi = true, device = Devices.PHONE)
 @Composable

@@ -12,7 +12,7 @@ object AppViewModelProvider {
     val Factory = viewModelFactory {
         // Initializer for MainFeedViewModel
         initializer {
-            val app = PaperBitesApplication()
+            val app = this.PaperBitesApplication()
             MainFeedViewModel(
                 app.container.paperRepository,
                 app.container.userPreferencesRepository
@@ -21,7 +21,7 @@ object AppViewModelProvider {
 
         // Initializer for BookmarkViewModel
         initializer {
-            val app = PaperBitesApplication()
+            val app = this.PaperBitesApplication()
             BookmarkViewModel(
                 app.container.bookmarkRepository
             )
