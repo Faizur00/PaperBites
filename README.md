@@ -32,3 +32,6 @@ PaperBites is a modern Android application designed for consuming bite-sized Res
 - [ ] Add quick share link/doi for the paper
 - [ ] Further refine dark mode and add custom color themes.
 - [ ] Optimize layout
+
+## Bugs
+- [ ] the refresher leading the content insertion from last session when app opened
