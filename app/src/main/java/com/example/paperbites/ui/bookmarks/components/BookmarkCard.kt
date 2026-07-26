@@ -1,6 +1,7 @@
 package com.example.paperbites.ui.bookmarks.components
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,20 +33,28 @@ import com.example.paperbites.ui.common.AnimatedIconButton
 import com.example.paperbites.ui.common.rememberFormattedText
 import com.example.paperbites.ui.theme.jetbrainsMonoFontFamily
 import com.example.paperbites.ui.theme.loraFontFamily
+import com.example.paperbites.utils.readFullPaper
 
 @Composable
 fun BookmarkCard(
     paper: BookmarkEntity,
     onToggleExpansion: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val formattedTitle = rememberFormattedText(paper.title, fontSize = 16.sp, color = Color(0xFF1A1A1A)) // Material titleMedium is around 16sp
     val formattedAbstract = rememberFormattedText(paper.abstract, fontSize = 12.sp, color = Color(0xFF8B8987)) // Material bodySmall is around 12sp
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, Color(0xFF1A1A1A)),
+            .border(1.dp, Color(0xFF1A1A1A))
+            .clickable(
+                onClick = {
+                    readFullPaper(context = context, doi = paper.doi)
+                }
+            )
+        ,
         shape = RectangleShape,
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFDFCFB)),
         elevation = CardDefaults.cardElevation(2.dp)

@@ -39,7 +39,7 @@ fun BookmarkScreen(
                 papers = bookmarkUiState,
                 onToggleExpansion = { paper ->
                     viewModel.toggleExpansion(paper.paperId, paper.isExpanded)
-                }
+                },
             )
         }
     }

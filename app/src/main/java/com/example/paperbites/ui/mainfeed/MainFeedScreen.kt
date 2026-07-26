@@ -121,7 +121,8 @@ fun MainFeedScreen(
                         currentPaper?.let { viewModel.toggleBookmark(it) }
                     },
                     whiteButtonIcon = if (isCurrentBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                    whiteButtonText = if (isCurrentBookmarked) "SAVED" else "SAVE"
+                    whiteButtonText = if (isCurrentBookmarked) "SAVED" else "SAVE",
+                    doi = currentPaper?.doi
                 )
             },
             containerColor = BGWhite

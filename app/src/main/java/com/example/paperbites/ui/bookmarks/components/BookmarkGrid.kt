@@ -16,7 +16,7 @@ import com.example.paperbites.data.database.Entity.BookmarkEntity
 fun BookmarkGrid(
     papers: List<BookmarkEntity>,
     onToggleExpansion: (BookmarkEntity) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 163.dp),
@@ -41,7 +41,7 @@ fun BookmarkGrid(
                 paper = paper,
                 onToggleExpansion = { onToggleExpansion(paper) },
                 modifier = Modifier
-                    .animateItem()
+                    .animateItem(),
             )
         }
     }
